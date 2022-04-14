@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "transform": "node scripts/transform.js",
     "serve": "node scripts/serve.js",
     "build": "node scripts/build.js"
   },
