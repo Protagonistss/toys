@@ -1,8 +1,6 @@
-import React from 'react'
-import { createRoot } from 'react-dom/client'
+// import React from 'react'
+import { render } from 'https://cdn.skypack.dev/react-dom'
 
-const root = document.getElementById('root')
-const app = createRoot(root)
-app.render(
-  <h1>Hello React</h1>
-)
+const RootElement = () => <h1>hello esbuild</h1>
+
+render(<RootElement></RootElement>, document.getElementById('root'))

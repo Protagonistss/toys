@@ -1,24 +1,20 @@
 const { build } = require('esbuild')
+const CDN = require('../plugins/import-cdn')
 
 const entry = async () => {
-  const result = await build({
+  build({
     absWorkingDir: process.cwd(),
     entryPoints: ['./main.jsx'],
     outdir: 'dist',
     bundle: true,
     format: 'esm',
-    external: [],
     splitting: true,
     sourcemap: true,
     metafile: true,
-    minify: false,
-    watch: false,
-    write: true,
-    loader: {
-      '.png': 'base64'
-    }
+    plugins: [CDN()]
+  }).then(() => {
+    console.log('build finished')
   })
-  console.log('result', result)
 }
 
 entry()
