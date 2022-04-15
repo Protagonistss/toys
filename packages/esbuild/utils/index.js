@@ -1,5 +1,5 @@
-const createScript = (src) => `<script type="module" src="${src}"></script>`;
-const createLink = (src) => `<link rel="stylesheet" href="${src}"></link>`;
+const createScript = (src) => `<script type="module" src="${src}"></script>`
+const createLink = (src) => `<link rel="stylesheet" href="${src}"></link>`
 const generateHTML = (scripts, links) => `
 <!DOCTYPE html>
 <html lang="en">
@@ -17,6 +17,6 @@ const generateHTML = (scripts, links) => `
 </body>
 
 </html>
-`;
+`
 
-module.exports = { createLink, createScript, generateHTML };
+module.exports = { createLink, createScript, generateHTML }
