@@ -1,23 +1,7 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import logo from './logo.svg'
 import './App.css'
 
-
-const todoList:TListItem[] = [
-  { title: '开发任务-1', status: '22-05-22 18:15' },
-  { title: '开发任务-3', status: '22-05-22 18:15' },
-  { title: '开发任务-5', status: '22-05-22 18:15' },
-  { title: '测试任务-3', status: '22-05-22 18:15' }
-];
-const ongoingList:TListItem[] = [
-  { title: '开发任务-4', status: '22-05-22 18:15' },
-  { title: '开发任务-6', status: '22-05-22 18:15' },
-  { title: '测试任务-2', status: '22-05-22 18:15' }
-];
-const doneList:TListItem[] = [
-  { title: '开发任务-2', status: '22-05-22 18:15' },
-  { title: '测试任务-1', status: '22-05-22 18:15' }
-];
 
 type TListItem = { title: string, status: string }
 
@@ -27,11 +11,59 @@ const KanbanCard = ({ title, status }:TListItem) => {
       <div className="card-title">{title}</div>
       <div className="card-status">{status}</div>
     </li>
-  );
-};
+  )
+}
+
+
+const KanbanNewCard = ({ onSubmit }: { onSubmit: (title: string) => void }) => {
+  const [ title, setTitle ] = useState('')
+  const handleChange: React.ChangeEventHandler<HTMLInputElement> = (evt) => {
+    setTitle(evt.target.value)
+  }
+  const handleKeyDown: React.KeyboardEventHandler = (evt) => {
+    if (evt.key === 'Enter') {
+      onSubmit(title)
+    }
+  }
+  return (
+    <li className="kanban-card">
+      <h3>添加新卡片</h3>
+      <div className="card-title">
+        <input type="text" value={ title } onChange={ handleChange } onKeyDown={ handleKeyDown }/>
+      </div>
+    </li>
+  )
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [showAdd, setShowAdd] = useState(false)
+  const [todoList, setTodoList] = useState([
+    { title: '开发任务-1', status: '22-05-22 18:15' },
+    { title: '开发任务-3', status: '22-05-22 18:15' },
+    { title: '开发任务-5', status: '22-05-22 18:15' },
+    { title: '测试任务-3', status: '22-05-22 18:15' }
+  ])
+  const [ ongoingList, setOngoingList ] = useState([
+    { title: '开发任务-4', status: '22-05-22 18:15' },
+    { title: '开发任务-6', status: '22-05-22 18:15' },
+    { title: '测试任务-2', status: '22-05-22 18:15' }
+  ])
+  const [ doneList, setDoneList ] = useState([
+    { title: '开发任务-2', status: '22-05-22 18:15' },
+    { title: '测试任务-1', status: '22-05-22 18:15' }
+  ])
+  const handleAdd = (evt: React.FormEvent<HTMLButtonElement>) => {
+    setShowAdd(true)
+  }
+
+  const handleSubmit = (title:string) => {
+    setTodoList((current: TListItem[]) => [
+      { title: title, status: new Date().toDateString() },
+      ...current
+    ])
+    todoList.unshift({ title: title, status: new Date().toDateString() })
+    setShowAdd(false)
+  }
 
   return (
     <div className="App">
@@ -41,27 +73,32 @@ function App() {
       </header>
       <main className="kanban-board">
         <section className="kanban-column column-todo">
-          <h2>待处理</h2>
+          <h2>
+            待处理
+            <button onClick={handleAdd} disabled={showAdd}>⊕ 添加新卡片</button>
+          </h2>
           <ul>
+            { showAdd && <KanbanNewCard onSubmit={handleSubmit}/> }
             {
-              new Array(10).fill('').map(item => {
-                return <li className="kanban-card">
-                    <div className="card-title">
-                      开发任务-1
-                    </div>
-                    <div className="card-status">
-                      22-05-22 18:15
-                    </div>
-                  </li>
-              })
+              todoList.map(props => <KanbanCard { ...props }/>)
             }
           </ul>
         </section>
         <section className="kanban-column column-ongoing">
           <h1>进行中</h1>
+          <ul>
+            {
+              ongoingList.map(props => <KanbanCard {...props}/>)
+            }
+          </ul>
         </section>
         <section className="kanban-column column-done">
           <h2>已完成</h2>
+          <ul>
+            {
+              doneList.map(props => <KanbanCard { ...props }/>)
+            }
+          </ul>
         </section>
       </main>
     </div>
