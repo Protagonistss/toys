@@ -2,6 +2,34 @@ import { useState } from 'react'
 import logo from './logo.svg'
 import './App.css'
 
+
+const todoList:TListItem[] = [
+  { title: '开发任务-1', status: '22-05-22 18:15' },
+  { title: '开发任务-3', status: '22-05-22 18:15' },
+  { title: '开发任务-5', status: '22-05-22 18:15' },
+  { title: '测试任务-3', status: '22-05-22 18:15' }
+];
+const ongoingList:TListItem[] = [
+  { title: '开发任务-4', status: '22-05-22 18:15' },
+  { title: '开发任务-6', status: '22-05-22 18:15' },
+  { title: '测试任务-2', status: '22-05-22 18:15' }
+];
+const doneList:TListItem[] = [
+  { title: '开发任务-2', status: '22-05-22 18:15' },
+  { title: '测试任务-1', status: '22-05-22 18:15' }
+];
+
+type TListItem = { title: string, status: string }
+
+const KanbanCard = ({ title, status }:TListItem) => {
+  return (
+    <li className="kanban-card">
+      <div className="card-title">{title}</div>
+      <div className="card-status">{status}</div>
+    </li>
+  );
+};
+
 function App() {
   const [count, setCount] = useState(0)
 
@@ -12,9 +40,29 @@ function App() {
         <img src={logo} className="App-logo" alt="logo" />
       </header>
       <main className="kanban-board">
-        <section className="kanban-column"></section>
-        <section className="kanban-column"></section>
-        <section className="kanban-column"></section>
+        <section className="kanban-column column-todo">
+          <h2>待处理</h2>
+          <ul>
+            {
+              new Array(10).fill('').map(item => {
+                return <li className="kanban-card">
+                    <div className="card-title">
+                      开发任务-1
+                    </div>
+                    <div className="card-status">
+                      22-05-22 18:15
+                    </div>
+                  </li>
+              })
+            }
+          </ul>
+        </section>
+        <section className="kanban-column column-ongoing">
+          <h1>进行中</h1>
+        </section>
+        <section className="kanban-column column-done">
+          <h2>已完成</h2>
+        </section>
       </main>
     </div>
   )
