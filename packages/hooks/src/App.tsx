@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { ReactNode, useState } from 'react'
 import logo from './logo.svg'
 import './App.css'
 
@@ -35,6 +35,24 @@ const KanbanNewCard = ({ onSubmit }: { onSubmit: (title: string) => void }) => {
   )
 }
 
+const KanbanColumn = ({ children, className, title }: { children: ReactNode, className: string, title: string | ReactNode }) => {
+  const combinedClassName = `kanban-column ${className}`
+  return (
+    <section className={combinedClassName}>
+      <h2>{title}</h2>
+      <ul>{children}</ul>
+    </section>
+  )
+}
+
+const KanBoard = ({ children }: { children: ReactNode }) => {
+  return (
+    <main className="kanban-board">
+      {children}
+    </main>
+  )
+}
+
 function App() {
   const [showAdd, setShowAdd] = useState(false)
   const [todoList, setTodoList] = useState([
@@ -55,7 +73,6 @@ function App() {
   const handleAdd = (evt: React.FormEvent<HTMLButtonElement>) => {
     setShowAdd(true)
   }
-
   const handleSubmit = (title:string) => {
     setTodoList((current: TListItem[]) => [
       { title: title, status: new Date().toDateString() },
@@ -64,43 +81,25 @@ function App() {
     todoList.unshift({ title: title, status: new Date().toDateString() })
     setShowAdd(false)
   }
-
   return (
     <div className="App">
       <header className="App-header">
         <h1>我的看板</h1>
         <img src={logo} className="App-logo" alt="logo" />
       </header>
-      <main className="kanban-board">
-        <section className="kanban-column column-todo">
-          <h2>
-            待处理
-            <button onClick={handleAdd} disabled={showAdd}>⊕ 添加新卡片</button>
-          </h2>
-          <ul>
-            { showAdd && <KanbanNewCard onSubmit={handleSubmit}/> }
-            {
-              todoList.map(props => <KanbanCard { ...props }/>)
-            }
-          </ul>
-        </section>
-        <section className="kanban-column column-ongoing">
-          <h1>进行中</h1>
-          <ul>
-            {
-              ongoingList.map(props => <KanbanCard {...props}/>)
-            }
-          </ul>
-        </section>
-        <section className="kanban-column column-done">
-          <h2>已完成</h2>
-          <ul>
-            {
-              doneList.map(props => <KanbanCard { ...props }/>)
-            }
-          </ul>
-        </section>
-      </main>
+      <KanBoard>
+        <KanbanColumn className="column-todo" title={<>待处理<button onClick={handleAdd}
+          disabled={showAdd}>&#8853; 添加新卡片</button></>}>
+            {showAdd && <KanbanNewCard onSubmit={handleSubmit} />}
+            {todoList.map(props => <KanbanCard { ...props }/>)}
+        </KanbanColumn>
+        <KanbanColumn className="column-ongoing" title='进行中'>
+            {ongoingList.map(props => <KanbanCard {...props}/>)}
+        </KanbanColumn>
+        <KanbanColumn className="column-done" title="已完成">
+            {doneList.map(props => <KanbanCard { ...props }/>)}
+        </KanbanColumn>
+      </KanBoard>
     </div>
   )
 }
