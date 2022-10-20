@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react'
+import React, { ReactNode, useEffect, useState } from 'react'
 import logo from './logo.svg'
 import './App.css'
 
@@ -53,7 +53,10 @@ const KanBoard = ({ children }: { children: ReactNode }) => {
   )
 }
 
+const DATA_STORE_KEY = 'kanban-data-store'
+
 function App() {
+  const [isLoading, setIsLoading] = useState(true)
   const [showAdd, setShowAdd] = useState(false)
   const [todoList, setTodoList] = useState([
     { title: '开发任务-1', status: '22-05-22 18:15' },
@@ -70,6 +73,18 @@ function App() {
     { title: '开发任务-2', status: '22-05-22 18:15' },
     { title: '测试任务-1', status: '22-05-22 18:15' }
   ])
+  useEffect(() => {
+    const data = window.localStorage.getItem(DATA_STORE_KEY)
+    setTimeout(() => {
+      if (data) {
+        const kanbanColumnData = JSON.parse(data)
+        setTodoList(kanbanColumnData.todoList)
+        setOngoingList(kanbanColumnData.ongoingList)
+        setDoneList(kanbanColumnData.doneList)
+      }
+      setIsLoading(false)
+    }, 1000)
+  }, [])
   const handleAdd = (evt: React.FormEvent<HTMLButtonElement>) => {
     setShowAdd(true)
   }
@@ -81,13 +96,22 @@ function App() {
     todoList.unshift({ title: title, status: new Date().toDateString() })
     setShowAdd(false)
   }
+  const handleSaveAll = () => {
+    const data = JSON.stringify({
+      todoList,
+      ongoingList,
+      doneList
+    })
+    window.localStorage.setItem(DATA_STORE_KEY, data)
+  }
   return (
     <div className="App">
       <header className="App-header">
-        <h1>我的看板</h1>
+        <h1>我的看板 <button onClick={handleSaveAll}>保存所有卡片</button></h1>
         <img src={logo} className="App-logo" alt="logo" />
       </header>
       <KanBoard>
+        {/* { isLoading ? () : () } */}
         <KanbanColumn className="column-todo" title={<>待处理<button onClick={handleAdd}
           disabled={showAdd}>&#8853; 添加新卡片</button></>}>
             {showAdd && <KanbanNewCard onSubmit={handleSubmit} />}
