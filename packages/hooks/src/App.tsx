@@ -35,7 +35,7 @@ const KanbanNewCard = ({ onSubmit }: { onSubmit: (title: string) => void }) => {
   )
 }
 
-const KanbanColumn = ({ children, className, title }: { children: ReactNode, className: string, title: string | ReactNode }) => {
+const KanbanColumn = ({ children, className, title }: { children?: ReactNode, className: string, title: string | ReactNode }) => {
   const combinedClassName = `kanban-column ${className}`
   return (
     <section className={combinedClassName}>
@@ -111,18 +111,19 @@ function App() {
         <img src={logo} className="App-logo" alt="logo" />
       </header>
       <KanBoard>
-        {/* { isLoading ? () : () } */}
-        <KanbanColumn className="column-todo" title={<>待处理<button onClick={handleAdd}
-          disabled={showAdd}>&#8853; 添加新卡片</button></>}>
-            {showAdd && <KanbanNewCard onSubmit={handleSubmit} />}
-            {todoList.map(props => <KanbanCard { ...props }/>)}
-        </KanbanColumn>
-        <KanbanColumn className="column-ongoing" title='进行中'>
-            {ongoingList.map(props => <KanbanCard {...props}/>)}
-        </KanbanColumn>
-        <KanbanColumn className="column-done" title="已完成">
-            {doneList.map(props => <KanbanCard { ...props }/>)}
-        </KanbanColumn>
+        { isLoading ? (<KanbanColumn className="column-todo" title="读取中..."></KanbanColumn>) : (<>
+          <KanbanColumn className="column-todo" title={<>待处理<button onClick={handleAdd}
+            disabled={showAdd}>&#8853; 添加新卡片</button></>}>
+              {showAdd && <KanbanNewCard onSubmit={handleSubmit} />}
+              {todoList.map(props => <KanbanCard { ...props }/>)}
+          </KanbanColumn>
+          <KanbanColumn className="column-ongoing" title='进行中'>
+              {ongoingList.map(props => <KanbanCard {...props}/>)}
+          </KanbanColumn>
+          <KanbanColumn className="column-done" title="已完成">
+              {doneList.map(props => <KanbanCard { ...props }/>)}
+          </KanbanColumn>
+        </>) }
       </KanBoard>
     </div>
   )
