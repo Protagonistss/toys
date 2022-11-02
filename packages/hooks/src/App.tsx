@@ -3,11 +3,16 @@ import logo from './logo.svg'
 import './App.css'
 
 
-type TListItem = { title: string, status: string }
+type TListItem = { title: string, status: string, onDragStart?: (arg: any) => any }
 
-const KanbanCard = ({ title, status }:TListItem) => {
+const KanbanCard = ({ title, status, onDragStart }:TListItem) => {
+  const handleDragStart = (evt: React.DragEvent<HTMLLIElement>) => {
+    evt.dataTransfer.effectAllowed = 'move'
+    evt.dataTransfer.setData('text/plain', title)
+    onDragStart && onDragStart(evt)
+  }
   return (
-    <li className="kanban-card">
+    <li className="kanban-card" draggable onDragStart={handleDragStart}>
       <div className="card-title">{title}</div>
       <div className="card-status">{status}</div>
     </li>
@@ -35,10 +40,16 @@ const KanbanNewCard = ({ onSubmit }: { onSubmit: (title: string) => void }) => {
   )
 }
 
-const KanbanColumn = ({ children, className, title }: { children?: ReactNode, className: string, title: string | ReactNode }) => {
+const KanbanColumn = ({ children, className, title, setIsDragSource, setIsDragTarget }: { children?: ReactNode, className: string, title: string | ReactNode, setIsDragSource: (arg: boolean) => void, setIsDragTarget: (arg: boolean) => void }) => {
   const combinedClassName = `kanban-column ${className}`
   return (
-    <section className={combinedClassName}>
+    <section
+      onDragStart={() => { setIsDragSource(true) }}
+      onDragOver={evt => { evt.preventDefault(); evt.dataTransfer.dropEffect = 'move'; setIsDragTarget(true) }}
+      onDragLeave={evt => { evt.preventDefault(); evt.dataTransfer.dropEffect = 'none'; setIsDragTarget(false) }}
+      onDrop={evt => {evt.preventDefault()}}
+      onDragEnd={evt => { evt.preventDefault(); setIsDragSource(false); setIsDragTarget(false) }}
+      className={combinedClassName}>
       <h2>{title}</h2>
       <ul>{children}</ul>
     </section>
@@ -54,6 +65,9 @@ const KanBoard = ({ children }: { children: ReactNode }) => {
 }
 
 const DATA_STORE_KEY = 'kanban-data-store'
+const COLUMN_KEY_TODO = 'todo'
+const COLUMN_KEY_ONGOING = 'ongoing'
+const COLUMN_KEY_DONE = 'done'
 
 function App() {
   const [isLoading, setIsLoading] = useState(true)
@@ -104,6 +118,9 @@ function App() {
     })
     window.localStorage.setItem(DATA_STORE_KEY, data)
   }
+  const [draggedItem, setDraggedItem] = useState({})
+  const [dragSource, setDragSource] = useState(null)
+  const [dragTarget, setDragTarget] = useState(null)
   return (
     <div className="App">
       <header className="App-header">
@@ -115,7 +132,7 @@ function App() {
           <KanbanColumn className="column-todo" title={<>待处理<button onClick={handleAdd}
             disabled={showAdd}>&#8853; 添加新卡片</button></>}>
               {showAdd && <KanbanNewCard onSubmit={handleSubmit} />}
-              {todoList.map(props => <KanbanCard { ...props }/>)}
+              {todoList.map(props => <KanbanCard key={props.title} onDragStart={() => setDraggedItem(props)} { ...props }/>)}
           </KanbanColumn>
           <KanbanColumn className="column-ongoing" title='进行中'>
               {ongoingList.map(props => <KanbanCard {...props}/>)}
